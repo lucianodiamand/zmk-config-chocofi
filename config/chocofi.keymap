@@ -8,9 +8,9 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
 
-#define NAV 1
-#define NUM 2
-#define SYM 3
+#define _NAV 1
+#define _NUM 2
+#define _SYM 3
 
 / {
         chosen { zmk,matrix_transform = &five_column_transform; };
@@ -27,7 +27,7 @@
    &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P
    &mt LGUI A &mt LALT S &mt LCTRL D &mt LSHFT F &kp G   &kp H &mt RSHFT J &mt RCTRL K &mt RALT L  &mt RGUI SEMI
    &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH
-       &kp ESC &lt NAV kp SPACE &kp TAB  &lt SYM RET &lt NUM BSPC &kp DEL
+       &kp ESC &lt _NAV SPACE &kp TAB  &lt _SYM RET &lt _NUM BSPC &kp DEL
                         >;
                 };
 
