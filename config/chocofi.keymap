@@ -34,10 +34,10 @@
 // |     |     |     |     |     |   |HOME |PG_DN|PG_UP| END | INS |
 //             |     |     |     |   | ENT |     |     |
                         bindings = <
- &none &none &none  &none  &none       &none     &none     &none     &none     &none
- &LGUI &LALT &LCTRL &LSHFT &none       &kp LEFT  &kp DOWN  &kp UP    &kp RIGHT &none
- &none &none &none  &none  &none       &kp HOME  &kp PG_DN &kp PG_UP &kp END   &kp INS
-              &none &trans &none       &kp ENTER &none     &none
+ &none    &none    &none     &none     &none  &none     &none     &none     &none     &none
+ &kp LGUI &kp LALT &kp LCTRL &kp LSHFT &none  &kp LEFT  &kp DOWN  &kp UP    &kp RIGHT &none
+ &none    &none    &none     &none     &none  &kp HOME  &kp PG_DN &kp PG_UP &kp END   &kp INS
+                          &none &trans &none  &kp ENTER &none     &none
                         >;
                 };
 
