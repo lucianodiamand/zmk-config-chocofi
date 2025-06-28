@@ -32,7 +32,7 @@
 // |     |     |     |     |     |   |     |     |     |     |     |
 // |LGUI |LALT |LCTRL|LSHFT|     |   | LFT | DWN |  UP | RGT |     |
 // |     |     |     |     |     |   |HOME |PG_DN|PG_UP| END | INS |
-//             |     |     |     |   | ENT |     |     |
+//             |     |_____|     |   | ENT |     |     |
                         bindings = <
  &none    &none    &none     &none     &none  &none     &none     &none     &none     &none
  &kp LGUI &kp LALT &kp LCTRL &kp LSHFT &none  &kp LEFT  &kp DOWN  &kp UP    &kp RIGHT &none
@@ -41,17 +41,31 @@
                         >;
                 };
 
-                raise_layer {
-// -----------------------------------------------------------------------------------------
-// |  !  |  @  |  #  |  $  |  %  |   |  ^  |  &  |  *  |  (  |  )  |
-// |     |     |     |     |     |   |  -  |  =  |  [  |  ]  |  \  |
-// |     |     |     |     |     |   |  _  |  +  |  {  |  }  | "|" |
-//                    | GUI |     | SPC |   | ENT |     | ALT |
+                num_layer {
+// -----------------------------------------------------------------
+// |  [  |  7  |  8  |  9  |  ]  |   |     |     |     |     |     |
+// |  ;  |  4  |  5  |  6  |  =  |   |     |RSHFT|RCTRL|RALT |RLGUI|
+// |  `  |  1  |  2  |  3  |  \  |   |     |     |     |     |     |
+//             |  '  |  0  |  -  |   |     |     |_____|     |
                         bindings = <
-   &kp EXCL &kp AT &kp HASH &kp DLLR &kp PRCNT   &kp CARET &kp AMPS  &kp ASTRK &kp LPAR &kp RPAR
-   &trans   &trans &trans   &trans   &trans      &kp MINUS &kp EQUAL &kp LBKT  &kp RBKT &kp BSLH
-   &trans   &trans &trans   &trans   &trans      &kp UNDER &kp PLUS  &kp LBRC  &kp RBRC &kp PIPE
-                &kp LGUI &trans   &kp SPACE   &kp RET   &trans    &kp RALT
+  &kp LBKT  &kp N7 &kp N8 &kp N9 &kp RBKT      &none &none     &none     &none    &none
+  &kp SCLN  &kp N4 &kp N5 &kp N6 &kp EQUAL     &none &kp RSHFT &kp RCTRL &kp RALT &kp RLGUI
+  &kp GRAVE &kp N1 &kp N2 &kp N3 &kp BSLH      &none &none     &none     &none    &none
+                  &kp SQT &kp N0 &kp MINUS     &none &trans &none
+                        >;
+                };
+
+                sym_layer {
+// -----------------------------------------------------------------
+// |  {  |  &  |  *  |  (  |  }  |   |     |     |     |     |     |
+// |  :  |  $  |  %  |  ^  |  +  |   |     |RSHFT|RCTRL|RALT |RLGUI|
+// |  ~  |  !  |  @  |  #  |  \  |   |     |     |     |     |     |
+//             |  (  |  )  |  _  |   |     |_____|     |     |
+                        bindings = <
+  &kp LBKT  &kp AMPS &kp ASTRK &kp LPAR  &kp RBKT   &none   &none   &none   &none   &none
+  &kp COLON &kp DLLR &kp PRCNT &kp CARET &kp PLUS   &none   &kp RSHFT &kp RCTRL &kp RALT &kp RLGUI
+  &kp TILDE &kp EXCL &kp AT    &kp HASH  &kp PIPE2  &none   &none   &none   &none   &none
+                     &kp LPAR  &kp RPAR  &kp UNDER  &trans  &none   &none
                         >;
                 };
         };
