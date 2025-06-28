@@ -7,12 +7,14 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/pointing.h>
 
 #define _NAV 1
 #define _NUM 2
 #define _SYM 3
 #define _MED 4
 #define _FUN 5
+#define _MOU 6
 
 / {
         chosen { zmk,matrix_transform = &five_column_transform; };
@@ -29,7 +31,7 @@
    &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P
    &mt LGUI A &mt LALT S &mt LCTRL D &mt LSHFT F &kp G   &kp H &mt RSHFT J &mt RCTRL K &mt RALT L  &mt RGUI SEMI
    &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH
-       &lt _MED ESC &lt _NAV SPACE &kp TAB  &lt _SYM RET &lt _NUM BSPC &lt _FUN DEL
+       &lt _MED ESC &lt _NAV SPACE &lt _MOU TAB  &lt _SYM RET &lt _NUM BSPC &lt _FUN DEL
                         >;
                 };
 
@@ -103,6 +105,19 @@
                        >;
                 };
 
+                mouse_layer {
+// -----------------------------------------------------------------
+// |     |     |     |     |     |   |     |     |     |     |     |
+// |LGUI |LALT |LCTRL|LSHFT|     |   |     |     |     |     |     |
+// |     |     |     |     |     |   |     |     |     |     |     |
+//             |     |     |_____|   |     |     |     |
+                        bindings = <
+&none &none &none &none &none                  &msc SCRL_LEFT &msc SCRL_DOWN &msc SCRL_UP &msc SCRL_RIGHT &none
+&kp LGUI &kp LALT &kp LCTRL &kp LSHFT &none    &mmv MOVE_LEFT &mmv MOVE_DOWN &mmv MOVE_UP &mmv &MOVE_RIGHT &none
+&none &none &none &none &none                  &none &none &none &none &none
+           &trans &none &trans     &mkp LCLK &mkp MCLK &mkp RCLK
+                       >;
+                };
         };
 };
 
