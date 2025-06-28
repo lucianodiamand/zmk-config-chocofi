@@ -11,6 +11,8 @@
 #define _NAV 1
 #define _NUM 2
 #define _SYM 3
+#define _MED 4
+#define _FUN 5
 
 / {
         chosen { zmk,matrix_transform = &five_column_transform; };
@@ -27,7 +29,7 @@
    &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P
    &mt LGUI A &mt LALT S &mt LCTRL D &mt LSHFT F &kp G   &kp H &mt RSHFT J &mt RCTRL K &mt RALT L  &mt RGUI SEMI
    &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH
-       &kp ESC &lt _NAV SPACE &kp TAB  &lt _SYM RET &lt _NUM BSPC &kp DEL
+       &lt _MED ESC &lt _NAV SPACE &kp TAB  &lt _SYM RET &lt _NUM BSPC &lt _FUN DEL
                         >;
                 };
 
@@ -72,6 +74,35 @@
                    &kp LPAR  &kp RPAR  &kp UNDER &trans &none     &none
                         >;
                 };
+
+                media_layer {
+// -----------------------------------------------------------------
+// |     |     |     |     |     |   |     |     |     |     |     |
+// |LGUI |LALT |LCTRL|LSHFT|     |   |     |     |     |     |     |
+// |     |     |     |     |     |   |     |     |     |     |     |
+//             |_____|     |     |   |     |     |     |  
+                        bindings = <
+&none &none &none &none &none                  &none &none &none &none &none
+&kp LGUI &kp LALT &kp LCTRL &kp LSHFT &none    &none &none &none &none &none
+&none &none &none &none &none                  &none &none &none &none &none
+           &trans &none &none     &none &none &none
+                       >;
+                };
+
+                fun_layer {
+// -----------------------------------------------------------------
+// | F12 |  F7 |  F8 |  F9 | PSCN|   |     |     |     |     |     |
+// | F11 |  F4 |  F5 |  F6 | SCLO|   |     |RSHFT|RCTRL|RALT |RGUI |
+// | F10 |  F1 |  F2 |  FV | PAUS|   |     |     |     |     |     |
+//             |  APP| SPC | TAB |   |     |_____|     |     |
+                        bindings = <
+&kp F12 &kp F7 &kp F8 &kp F9 &kp PSCRN        &none &none &none  &none &none
+&kp F11 &kp F4 &kp F5 &kp F6 &kp SLCK         &none &kp RSHFT &kp RCTRL &kp RALT &kp RGUI
+&kp F10 &kp F1 &kp F2 &kp F3 &kp PAUSE_BREAK  &none &none &none  &none &none
+         &kp K_APP &kp SPACE &kp TAB          &none &none &trans
+                       >;
+                };
+
         };
 };
 
