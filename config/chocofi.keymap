@@ -15,7 +15,7 @@
 #define _FUN 5
 #define _MOU 6
 
-&hm {
+&mt {
     flavor = "tap-preferred";
 };
 
@@ -32,7 +32,7 @@
 //             | GUI | LWR | SPC |   | ENT | RSE  | ALT |
                         bindings = <
    &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P
-   &hm LGUI A &hm LALT S &hm LCTRL D &hm LSHFT F &kp G   &kp H &hm RSHFT J &hm RCTRL K &hm RALT L &hm RGUI SEMI
+   &mt LGUI A &mt LALT S &mt LCTRL D &mt LSHFT F &kp G   &kp H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
    &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH
        &lt _MED ESC &lt _NAV SPACE &lt _MOU TAB  &lt _SYM RET &lt _NUM BSPC &lt _FUN DEL
                         >;
