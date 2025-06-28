@@ -15,7 +15,12 @@
 #define _FUN 5
 #define _MOU 6
 
+&lt {
+    quick-tap-ms = <200>;
+};
+
 &mt {
+    quick-tap-ms = <200>;
     flavor = "tap-preferred";
 };
 
