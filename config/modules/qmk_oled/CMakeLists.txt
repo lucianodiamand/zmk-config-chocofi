@@ -1,5 +1,9 @@
 if(CONFIG_CHOCOFI_QMK_OLED)
   zephyr_library()
   zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
-  zephyr_library_sources(dashboard.c case_keys.c)
+  zephyr_library_sources(dashboard.c)
+
+  if(NOT CONFIG_ZMK_SPLIT OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+    zephyr_library_sources(case_keys.c)
+  endif()
 endif()
