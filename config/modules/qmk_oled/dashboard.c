@@ -135,7 +135,7 @@ static void portrait_flush(lv_display_t *display, const lv_area_t *area, uint8_t
             if (x < 0 || x >= 68 || y < 0 || y >= 160) { continue; }
             uint32_t bit_index = (y - area->y1) * stride_bits + x - area->x1;
             bool white = (src[bit_index / 8] & BIT(7 - bit_index % 8)) != 0;
-            int px = y, py = 67 - x;
+            int px = 159 - y, py = x;
             size_t idx;
             uint8_t bit;
             if (oled_caps.screen_info & SCREEN_INFO_MONO_VTILED) {
