@@ -1,4 +1,5 @@
 if(CONFIG_CHOCOFI_QMK_OLED)
   zephyr_library()
+  zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
   zephyr_library_sources(dashboard.c)
 endif()
