@@ -2,5 +2,5 @@ config CHOCOFI_QMK_OLED
     bool "QMK-style portrait dashboard"
     default y
     depends on ZMK_DISPLAY
-    select LV_OBJ_LABEL
+    select LV_USE_LABEL
     select LV_FONT_UNSCII_8
