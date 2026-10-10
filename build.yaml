@@ -1,5 +1,7 @@
 include:
   - board: nice_nano@2.0.0//zmk
-    shield: chocofi_left
+    shield: chocofi_left nice_view_adapter nice_view
+    artifact-name: chocofi_left_niceview
   - board: nice_nano@2.0.0//zmk
-    shield: chocofi_right
+    shield: chocofi_right nice_view_adapter nice_view
+    artifact-name: chocofi_right_niceview

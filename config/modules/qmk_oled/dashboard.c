@@ -29,7 +29,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 static atomic_t packed_state, packed_connection;
 static atomic_t last_received;
 static lv_obj_t *rows[10];
-static const int y_pos[] = {0,16,32,48,56,64,72,88,104,112};
+static const int y_pos[] = {0,20,40,60,72,84,96,116,136,148};
 static const char *layers[] = {"NORM","NAVI","NUMB","SYMB","MEDI","FUNC","MOUS"};
 static const char *modes[] = {"TEXT","UPSK","SNAK","PASC","CAML"};
 
@@ -120,11 +120,11 @@ static void update(lv_timer_t *timer) {
 
 
 /* LVGL I1 uses horizontal MSB-first bits after an 8-byte palette.
- * Convert changed logical regions (32x128) into the SSD1306 native 128x32
+ * Convert changed logical regions (68x160) into the nice!view native 160x68
  * framebuffer, rotating 270 degrees and respecting driver pixel polarity. */
 static const struct device *oled = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 static struct display_capabilities oled_caps;
-static uint8_t native_frame[128 * 32 / 8];
+static uint8_t native_frame[160 * 68 / 8];
 
 static void portrait_flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map) {
     const uint8_t *src = px_map + 8;
@@ -132,17 +132,17 @@ static void portrait_flush(lv_display_t *display, const lv_area_t *area, uint8_t
     uint32_t stride_bits = ROUND_UP(width, CONFIG_LV_DRAW_BUF_STRIDE_ALIGN);
     for (int y = area->y1; y <= area->y2; y++) {
         for (int x = area->x1; x <= area->x2; x++) {
-            if (x < 0 || x >= 32 || y < 0 || y >= 128) { continue; }
+            if (x < 0 || x >= 68 || y < 0 || y >= 160) { continue; }
             uint32_t bit_index = (y - area->y1) * stride_bits + x - area->x1;
             bool white = (src[bit_index / 8] & BIT(7 - bit_index % 8)) != 0;
-            int px = y, py = 31 - x;
+            int px = y, py = 67 - x;
             size_t idx;
             uint8_t bit;
             if (oled_caps.screen_info & SCREEN_INFO_MONO_VTILED) {
-                idx = px + (py / 8) * 128;
+                idx = px + (py / 8) * 160;
                 bit = py % 8;
             } else {
-                idx = px / 8 + py * 16;
+                idx = px / 8 + py * 20;
                 bit = px % 8;
             }
             if (oled_caps.screen_info & SCREEN_INFO_MONO_MSB_FIRST) { bit = 7 - bit; }
@@ -153,20 +153,20 @@ static void portrait_flush(lv_display_t *display, const lv_area_t *area, uint8_t
     }
     if (lv_display_flush_is_last(display)) {
         struct display_buffer_descriptor desc = {
-            .buf_size = sizeof(native_frame), .width = 128, .height = 32, .pitch = 128,
+            .buf_size = sizeof(native_frame), .width = 160, .height = 68, .pitch = 160,
         };
         int err = display_write(oled, 0, 0, &desc, native_frame);
-        if (err) { LOG_ERR("OLED write failed: %d", err); }
+        if (err) { LOG_ERR("Display write failed: %d", err); }
     }
     lv_display_flush_ready(display);
 }
 
 lv_obj_t *zmk_display_status_screen(void) {
     display_get_capabilities(oled, &oled_caps);
-    if (oled_caps.x_resolution != 128 || oled_caps.y_resolution != 32 ||
+    if (oled_caps.x_resolution != 160 || oled_caps.y_resolution != 68 ||
         (oled_caps.current_pixel_format != PIXEL_FORMAT_MONO01 &&
          oled_caps.current_pixel_format != PIXEL_FORMAT_MONO10)) {
-        LOG_ERR("Dashboard requires a 128x32 monochrome OLED");
+        LOG_ERR("Dashboard requires a 160x68 nice!view display");
         return NULL;
     }
     memset(native_frame, oled_caps.current_pixel_format == PIXEL_FORMAT_MONO10 ? 0 : 255,
@@ -178,14 +178,14 @@ lv_obj_t *zmk_display_status_screen(void) {
     lv_obj_remove_style_all(screen);
     lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
     lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, 0);
-    lv_obj_set_size(screen, 32, 128);
+    lv_obj_set_size(screen, 68, 160);
     lv_obj_clear_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
     for (int i=0;i<ARRAY_SIZE(rows);i++) {
         rows[i] = lv_label_create(screen);
         lv_obj_set_style_text_font(rows[i], &lv_font_unscii_8, 0);
         lv_obj_set_style_text_color(rows[i], lv_color_white(), 0);
         lv_obj_set_style_text_letter_space(rows[i], 0, 0);
-        lv_obj_set_pos(rows[i], 0, y_pos[i]);
+        lv_obj_set_pos(rows[i], 18, y_pos[i]);
     }
     update(NULL);
     lv_timer_create(update, 100, NULL);
