@@ -155,6 +155,10 @@
         };
     };
     behaviors {
+        dashboard_sync: dsync {
+            compatible = "custom,dashboard-sync";
+            #binding-cells = <2>;
+        };
         ux_n0: unicode_n0 {
             compatible = "zmk,behavior-mod-morph";
             #binding-cells = <0>;

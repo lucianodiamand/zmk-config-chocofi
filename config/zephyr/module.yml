@@ -1,0 +1,6 @@
+name: chocofi_qmk_oled
+build:
+  cmake: modules/qmk_oled
+  kconfig: modules/qmk_oled/Kconfig
+  settings:
+    dts_root: modules/qmk_oled
