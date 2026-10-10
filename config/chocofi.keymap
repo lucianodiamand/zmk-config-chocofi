@@ -17,15 +17,24 @@
 #define _MOU 6
 
 &lt {
+    bindings = <&mo>, <&ck>;
     quick-tap-ms = <200>;
 };
 
 &mt {
+    bindings = <&kp>, <&ck>;
     quick-tap-ms = <200>;
     flavor = "tap-preferred";
 };
 
 / {
+    combos {
+        compatible = "zmk,combos";
+        upper_snake { timeout-ms = <50>; key-positions = <4 5>; layers = <0>; bindings = <&cm 1>; };
+        lower_snake { timeout-ms = <50>; key-positions = <14 15>; layers = <0>; bindings = <&cm 2>; };
+        pascal { timeout-ms = <50>; key-positions = <4 15>; layers = <0>; bindings = <&cm 3>; };
+        camel { timeout-ms = <50>; key-positions = <14 5>; layers = <0>; bindings = <&cm 4>; };
+    };
     macros {
         uc_a_lower: uc_a_lower {
             compatible = "zmk,behavior-macro";
@@ -46,7 +55,7 @@
             #binding-cells = <0>;
             wait-ms = <40>;
             tap-ms = <40>;
-            bindings = <&kp A &kp A>;
+            bindings = <&ck A &ck A>;
         };
         uc_e_lower: uc_e_lower {
             compatible = "zmk,behavior-macro";
@@ -67,7 +76,7 @@
             #binding-cells = <0>;
             wait-ms = <40>;
             tap-ms = <40>;
-            bindings = <&kp E &kp E>;
+            bindings = <&ck E &ck E>;
         };
         uc_i_lower: uc_i_lower {
             compatible = "zmk,behavior-macro";
@@ -88,7 +97,7 @@
             #binding-cells = <0>;
             wait-ms = <40>;
             tap-ms = <40>;
-            bindings = <&kp I &kp I>;
+            bindings = <&ck I &ck I>;
         };
         uc_o_lower: uc_o_lower {
             compatible = "zmk,behavior-macro";
@@ -109,7 +118,7 @@
             #binding-cells = <0>;
             wait-ms = <40>;
             tap-ms = <40>;
-            bindings = <&kp O &kp O>;
+            bindings = <&ck O &ck O>;
         };
         uc_u_lower: uc_u_lower {
             compatible = "zmk,behavior-macro";
@@ -130,7 +139,7 @@
             #binding-cells = <0>;
             wait-ms = <40>;
             tap-ms = <40>;
-            bindings = <&kp U &kp U>;
+            bindings = <&ck U &ck U>;
         };
         uc_n_lower: uc_n_lower {
             compatible = "zmk,behavior-macro";
@@ -151,10 +160,12 @@
             #binding-cells = <0>;
             wait-ms = <40>;
             tap-ms = <40>;
-            bindings = <&kp N &kp N>;
+            bindings = <&ck N &ck N>;
         };
     };
     behaviors {
+        ck: case_key { compatible = "custom,case-key"; #binding-cells = <1>; };
+        cm: case_mode { compatible = "custom,case-mode"; #binding-cells = <1>; };
         dashboard_sync: dsync {
             compatible = "custom,dashboard-sync";
             #binding-cells = <2>;
@@ -247,7 +258,7 @@
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&kp E>, <&double_e>, <&accent_e>;
+            bindings = <&ck E>, <&double_e>, <&accent_e>;
         };
         accent_i: accent_i {
             compatible = "zmk,behavior-mod-morph";
@@ -259,7 +270,7 @@
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&kp I>, <&double_i>, <&accent_i>;
+            bindings = <&ck I>, <&double_i>, <&accent_i>;
         };
         accent_o: accent_o {
             compatible = "zmk,behavior-mod-morph";
@@ -271,7 +282,7 @@
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&kp O>, <&double_o>, <&accent_o>;
+            bindings = <&ck O>, <&double_o>, <&accent_o>;
         };
         accent_u: accent_u {
             compatible = "zmk,behavior-mod-morph";
@@ -283,7 +294,7 @@
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&kp U>, <&double_u>, <&accent_u>;
+            bindings = <&ck U>, <&double_u>, <&accent_u>;
         };
         accent_n: accent_n {
             compatible = "zmk,behavior-mod-morph";
@@ -295,7 +306,7 @@
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&kp N>, <&double_n>, <&accent_n>;
+            bindings = <&ck N>, <&double_n>, <&accent_n>;
         };
     };
 };
@@ -312,9 +323,9 @@
 // |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M   |  ,  |  .  |  /  |
 //            | ESC | SPACE | TAB |  | ENT | BSPC | DEL |
                         bindings = <
-   &kp Q &kp W &td_e &kp R &kp T   &kp Y &td_u  &td_i     &td_o   &kp P
-   &td_a &mt LALT S &mt LCTRL D &mt LSHFT F &kp G   &kp H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
-   &kp Z &kp X &kp C &kp V &kp B   &td_n &kp M  &kp COMMA &kp DOT &kp FSLH
+   &ck Q &ck W &td_e &ck R &ck T   &ck Y &td_u  &td_i     &td_o   &ck P
+   &td_a &mt LALT S &mt LCTRL D &mt LSHFT F &ck G   &ck H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
+   &ck Z &ck X &ck C &ck V &ck B   &td_n &ck M  &kp COMMA &kp DOT &kp FSLH
        &lt _MED ESC &lt _NAV SPACE &lt _MOU TAB  &lt _SYM RET &lt _NUM BSPC &lt _FUN DEL
                         >;
                 };
@@ -329,7 +340,7 @@
 &none    &none    &none     &none     &none  &none     &none     &none     &none     &none
 &kp LGUI &kp LALT &kp LCTRL &kp LSHFT &none  &kp LEFT  &kp DOWN  &kp UP    &kp RIGHT &none
 &none    &none    &none     &none     &none  &kp HOME  &kp PG_DN &kp PG_UP &kp END   &kp INS
-                         &none &trans &none  &kp ENTER &none     &none
+                         &none &trans &none  &ck ENTER &none     &none
                         >;
                 };
 
@@ -385,7 +396,7 @@
 &kp F12 &kp F7 &kp F8 &kp F9 &kp PSCRN        &none &none &none  &none &none
 &kp F11 &kp F4 &kp F5 &kp F6 &kp SLCK         &none &kp RSHFT &kp RCTRL &kp RALT &kp RGUI
 &kp F10 &kp F1 &kp F2 &kp F3 &kp PAUSE_BREAK  &none &none &none  &none &none
-         &kp K_APP &kp SPACE &kp TAB          &none &none &trans
+         &kp K_APP &ck SPACE &ck TAB          &none &none &trans
                        >;
                 };
 

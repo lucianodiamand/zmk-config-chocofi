@@ -1,0 +1,3 @@
+description: Chocofi case key
+compatible: "custom,case-key"
+include: one_param.yaml

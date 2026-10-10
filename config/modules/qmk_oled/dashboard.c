@@ -33,9 +33,7 @@ static const int y_pos[] = {0,20,40,60,72,84,96,116,136,148};
 static const char *layers[] = {"NORM","NAVI","NUMB","SYMB","MEDI","FUNC","MOUS"};
 static const char *modes[] = {"TEXT","UPSK","SNAK","PASC","CAML"};
 
-/* Override this when the casing behavior is migrated; display labels alone
- * must not claim a mode is active. 0 TEXT, 1 UPSK, 2 SNAK, 3 PASC, 4 CAML. */
-__attribute__((weak)) uint8_t chocofi_case_mode_get(void) { return 0; }
+uint8_t chocofi_case_mode_get(void);
 
 static int receive(struct zmk_behavior_binding *binding,
                    struct zmk_behavior_binding_event event) {
@@ -121,7 +119,8 @@ static void update(lv_timer_t *timer) {
 
 /* LVGL I1 uses horizontal MSB-first bits after an 8-byte palette.
  * Convert changed logical regions (68x160) into the nice!view native 160x68
- * framebuffer, rotating 270 degrees and respecting driver pixel polarity. */
+ * framebuffer, rotated 180 degrees from the initial portrait orientation.
+ * Respect driver pixel polarity. */
 static const struct device *oled = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 static struct display_capabilities oled_caps;
 static uint8_t native_frame[160 * 68 / 8];
