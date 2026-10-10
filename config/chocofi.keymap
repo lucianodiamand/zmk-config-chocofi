@@ -242,6 +242,14 @@
             bindings = <&uc_a_lower>, <&uc_a_upper>;
             mods = <(MOD_LSFT | MOD_RSFT)>;
         };
+        enter_sym: enter_symbol_layer {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <200>;
+            quick-tap-ms = <0>;
+            bindings = <&mo>, <&ck>;
+        };
         a_key: a_hold_tap {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -335,7 +343,7 @@
    &ck Q &ck W &td_e &ck R &ck T   &ck Y &td_u  &td_i     &td_o   &ck P
    &a_key LGUI 0 &mt LALT S &mt LCTRL D &mt LSHFT F &ck G   &ck H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
    &ck Z &ck X &ck C &ck V &ck B   &td_n &ck M  &kp COMMA &kp DOT &kp FSLH
-       &lt _MED ESC &lt _NAV SPACE &lt _MOU TAB  &lt _SYM RET &lt _NUM BSPC &lt _FUN DEL
+       &lt _MED ESC &lt _NAV SPACE &lt _MOU TAB  &enter_sym _SYM RET &lt _NUM BSPC &lt _FUN DEL
                         >;
                 };
 
