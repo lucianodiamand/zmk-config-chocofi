@@ -242,20 +242,20 @@
             bindings = <&uc_a_lower>, <&uc_a_upper>;
             mods = <(MOD_LSFT | MOD_RSFT)>;
         };
-        mt_a: mod_tap_a {
+        a_key: a_hold_tap {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "tap-preferred";
+            hold-trigger-key-positions = <10>;
             tapping-term-ms = <200>;
             quick-tap-ms = <200>;
-            require-prior-idle-ms = <150>;
-            bindings = <&kp>, <&ck>;
+            bindings = <&kp>, <&td_a>;
         };
         td_a: tap_dance_a {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&mt_a LGUI A>, <&double_a>, <&accent_a>;
+            bindings = <&ck A>, <&double_a>, <&accent_a>;
         };
         accent_e: accent_e {
             compatible = "zmk,behavior-mod-morph";
@@ -333,7 +333,7 @@
 //            | ESC | SPACE | TAB |  | ENT | BSPC | DEL |
                         bindings = <
    &ck Q &ck W &td_e &ck R &ck T   &ck Y &td_u  &td_i     &td_o   &ck P
-   &td_a &mt LALT S &mt LCTRL D &mt LSHFT F &ck G   &ck H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
+   &a_key LGUI 0 &mt LALT S &mt LCTRL D &mt LSHFT F &ck G   &ck H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
    &ck Z &ck X &ck C &ck V &ck B   &td_n &ck M  &kp COMMA &kp DOT &kp FSLH
        &lt _MED ESC &lt _NAV SPACE &lt _MOU TAB  &lt _SYM RET &lt _NUM BSPC &lt _FUN DEL
                         >;
