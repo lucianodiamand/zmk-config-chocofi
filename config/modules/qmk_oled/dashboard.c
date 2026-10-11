@@ -4,6 +4,7 @@
  */
 #define DT_DRV_COMPAT custom_dashboard_sync
 #include <stdio.h>
+#include <hal/nrf_power.h>
 #include <string.h>
 #include <zephyr/drivers/display.h>
 #include <zephyr/logging/log.h>
@@ -15,6 +16,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/battery.h>
 #include <zmk/display/status_screen.h>
 #include <zmk/activity.h>
+#include <zmk/event_manager.h>
+#include <zmk/events/position_state_changed.h>
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
 #include <zmk/wpm.h>
 #include <zmk/hid.h>
@@ -28,6 +31,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
  * Connection: profile bits 0..7, connected bit 8, unpaired bit 9. */
 static atomic_t packed_state, packed_connection;
 static atomic_t last_received;
+static atomic_t last_key_at;
+static bool panel_is_idle(void);
 static lv_obj_t *rows[10];
 static const int y_pos[] = {0,20,40,60,72,84,96,116,136,148};
 static const char *layers[] = {"NORM","NAVI","NUMB","SYMB","MEDI","FUNC","MOUS"};
@@ -60,16 +65,18 @@ K_WORK_DELAYABLE_DEFINE(publish_work, publish);
 static void publish(struct k_work *work) {
     static uint32_t old_state = UINT32_MAX, old_connection = UINT32_MAX;
     static int64_t sent_at;
-    if (zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE) {
+    {
+        bool idle = (uint32_t)((uint32_t)k_uptime_get() - (uint32_t)atomic_get(&last_key_at)) >= CONFIG_ZMK_IDLE_TIMEOUT;
         uint32_t state = (MIN(MAX(zmk_wpm_get_state(),0),999) & 1023)
           | ((zmk_keymap_highest_layer_active() & 15) << 10)
           | ((uint32_t)zmk_hid_get_explicit_mods() << 14)
           | ((uint32_t)(chocofi_case_mode_get() & 7) << 22);
         uint32_t connection = (zmk_ble_active_profile_index() + 1)
           | ((uint32_t)zmk_ble_active_profile_is_connected() << 8)
-          | ((uint32_t)zmk_ble_active_profile_is_open() << 9);
+          | ((uint32_t)zmk_ble_active_profile_is_open() << 9)
+          | ((uint32_t)idle << 10);
         int64_t now = k_uptime_get();
-        if (state != old_state || connection != old_connection || now - sent_at >= 2000) {
+        if (state != old_state || connection != old_connection || (!idle && now - sent_at >= 2000)) {
             struct zmk_behavior_binding binding = {
                 .behavior_dev = DEVICE_DT_NAME(DT_INST(0, custom_dashboard_sync)),
                 .param1 = state, .param2 = connection,
@@ -84,6 +91,7 @@ static void publish(struct k_work *work) {
 #endif
 
 static void update(lv_timer_t *timer) {
+    if (panel_is_idle()) return;
     uint32_t s = atomic_get(&packed_state), c = atomic_get(&packed_connection);
     uint8_t mods = (s >> 14) & 255, layer = (s >> 10) & 15, mode = (s >> 22) & 7;
     char text[8], modifier_text[5] = "    ";
@@ -112,7 +120,11 @@ static void update(lv_timer_t *timer) {
     snprintf(text, sizeof(text), "BT%u%c", (unsigned)(c & 255),
              (c & BIT(8)) ? '+' : ((c & BIT(9)) ? '?' : '-'));
     lv_label_set_text(rows[8], fresh ? text : "BT--");
-    snprintf(text, sizeof(text), "%3u%%", (unsigned)zmk_battery_state_of_charge());
+    /* VBUS detection also works on the peripheral without a USB HID stack.
+     * It reports USB power availability, not charger-current telemetry. */
+    bool usb_power = nrf_power_usbregstatus_vbusdet_get(NRF_POWER);
+    snprintf(text, sizeof(text), "%3u%%%c", (unsigned)zmk_battery_state_of_charge(),
+             usb_power ? '+' : ' ');
     lv_label_set_text(rows[9], text);
 }
 
@@ -124,8 +136,52 @@ static void update(lv_timer_t *timer) {
 static const struct device *oled = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 static struct display_capabilities oled_caps;
 static uint8_t native_frame[160 * 68 / 8];
+static atomic_t panel_idle;
+static lv_obj_t *dashboard_screen;
+struct k_work_q *zmk_display_work_q(void);
+/* nice!view has no display-enable GPIO: clear its memory LCD explicitly.
+ * Run all display writes and LVGL calls on the display's own queue. */
+static void panel_power_work(struct k_work *work) {
+    if (!dashboard_screen) return;
+    if (atomic_get(&panel_idle)) {
+        static uint8_t blank_frame[160 * 68 / 8];
+        memset(blank_frame, oled_caps.current_pixel_format == PIXEL_FORMAT_MONO01 ? 0 : 255,
+               sizeof(blank_frame));
+        struct display_buffer_descriptor desc = {
+            .buf_size = sizeof(blank_frame), .width = 160, .height = 68, .pitch = 160,
+        };
+        int err = display_write(oled, 0, 0, &desc, blank_frame);
+        if (err) LOG_ERR("Display idle clear failed: %d", err);
+    } else {
+        lv_obj_invalidate(dashboard_screen);
+    }
+}
+/* Keep the lightweight LVGL timer running so timeout and wakeup are reliable.
+ * No panel writes or label updates are performed while idle. */
+static bool panel_is_idle(void) {
+    bool idle = (uint32_t)((uint32_t)k_uptime_get() - (uint32_t)atomic_get(&last_key_at))
+                >= CONFIG_ZMK_IDLE_TIMEOUT;
+#if !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+    if (zmk_split_bt_peripheral_is_connected() && atomic_get(&last_received))
+        idle = (atomic_get(&packed_connection) & BIT(10)) != 0;
+#endif
+    if (idle != (bool)atomic_get(&panel_idle)) {
+        atomic_set(&panel_idle, idle);
+        panel_power_work(NULL);
+    }
+    return idle;
+}
+static int panel_key_activity(const zmk_event_t *eh) {
+    const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
+    if (ev) atomic_set(&last_key_at, (uint32_t)k_uptime_get());
+    return ZMK_EV_EVENT_BUBBLE;
+}
+ZMK_LISTENER(chocofi_panel_keys, panel_key_activity);
+ZMK_SUBSCRIPTION(chocofi_panel_keys, zmk_position_state_changed);
+
 
 static void portrait_flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map) {
+    if (atomic_get(&panel_idle)) { lv_display_flush_ready(display); return; }
     const uint8_t *src = px_map + 8;
     uint32_t width = area->x2 - area->x1 + 1;
     uint32_t stride_bits = ROUND_UP(width, CONFIG_LV_DRAW_BUF_STRIDE_ALIGN);
@@ -174,6 +230,8 @@ lv_obj_t *zmk_display_status_screen(void) {
     lv_display_set_rotation(display, LV_DISPLAY_ROTATION_270);
     lv_display_set_flush_cb(display, portrait_flush);
     lv_obj_t *screen = lv_obj_create(NULL);
+    dashboard_screen = screen;
+    atomic_set(&last_key_at, (uint32_t)k_uptime_get());
     lv_obj_remove_style_all(screen);
     lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
     lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, 0);
@@ -184,7 +242,7 @@ lv_obj_t *zmk_display_status_screen(void) {
         lv_obj_set_style_text_font(rows[i], &lv_font_unscii_8, 0);
         lv_obj_set_style_text_color(rows[i], lv_color_white(), 0);
         lv_obj_set_style_text_letter_space(rows[i], 0, 0);
-        lv_obj_set_pos(rows[i], 18, y_pos[i]);
+        lv_obj_set_pos(rows[i], i == 9 ? 14 : 18, y_pos[i]);
     }
     update(NULL);
     lv_timer_create(update, 100, NULL);
