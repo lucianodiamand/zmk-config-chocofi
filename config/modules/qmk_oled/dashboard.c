@@ -201,7 +201,8 @@ static void portrait_flush(lv_display_t *display, const lv_area_t *area, uint8_t
                 bit = px % 8;
             }
             if (oled_caps.screen_info & SCREEN_INFO_MONO_MSB_FIRST) { bit = 7 - bit; }
-            bool on = oled_caps.current_pixel_format == PIXEL_FORMAT_MONO10 ? white : !white;
+            /* MONO01: 0 = black, 1 = white. */
+            bool on = oled_caps.current_pixel_format == PIXEL_FORMAT_MONO01 ? white : !white;
             if (on) { native_frame[idx] |= BIT(bit); }
             else { native_frame[idx] &= ~BIT(bit); }
         }
@@ -224,7 +225,7 @@ lv_obj_t *zmk_display_status_screen(void) {
         LOG_ERR("Dashboard requires a 160x68 nice!view display");
         return NULL;
     }
-    memset(native_frame, oled_caps.current_pixel_format == PIXEL_FORMAT_MONO10 ? 0 : 255,
+    memset(native_frame, oled_caps.current_pixel_format == PIXEL_FORMAT_MONO01 ? 0 : 255,
            sizeof(native_frame));
     lv_display_t *display = lv_display_get_default();
     lv_display_set_rotation(display, LV_DISPLAY_ROTATION_270);
