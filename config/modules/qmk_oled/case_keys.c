@@ -5,6 +5,7 @@
 #include <drivers/behavior.h>
 #include <zmk/events/keycode_state_changed.h>
 #include <zmk/hid.h>
+#include <zmk/behavior.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/position_state_changed.h>
 #include "case_state.h"
@@ -22,16 +23,6 @@ static uint32_t vowel_at_position(uint32_t position) {
     default: return 0;
     }
 }
-static int capture_vowel_shift(const zmk_event_t *eh) {
-    const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
-    if (ev && ev->state && ev->position < ARRAY_SIZE(vowel_shift) &&
-        vowel_at_position(ev->position)) {
-        vowel_shift[ev->position] = zmk_hid_get_explicit_mods() & 0x22;
-    }
-    return ZMK_EV_EVENT_BUBBLE;
-}
-ZMK_LISTENER(chocofi_vowel_shift, capture_vowel_shift);
-ZMK_SUBSCRIPTION(chocofi_vowel_shift, zmk_position_state_changed);
 
 static struct case_state state;
 static atomic_t display_mode;
@@ -90,3 +81,37 @@ static const struct behavior_driver_api mode_api = {
 };
 BEHAVIOR_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, POST_KERNEL,
                        CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &mode_api);
+
+/* Capture modifiers when keymap invokes the physical vowel binding, rather
+ * than relying on a listener that may run after the tap-dance listener. */
+#undef DT_DRV_COMPAT
+#define DT_DRV_COMPAT custom_vowel_capture
+static int vowel_invoke(struct zmk_behavior_binding *b,
+                        struct zmk_behavior_binding_event e, bool pressed) {
+    struct zmk_behavior_binding target = {0};
+    switch (b->param1) {
+    case 0x70004:
+        target.behavior_dev = DEVICE_DT_NAME(DT_NODELABEL(a_key));
+        target.param1 = 0x700e3; /* LGUI */
+        break;
+    case 0x70008: target.behavior_dev = DEVICE_DT_NAME(DT_NODELABEL(td_e)); break;
+    case 0x7000c: target.behavior_dev = DEVICE_DT_NAME(DT_NODELABEL(td_i)); break;
+    case 0x70012: target.behavior_dev = DEVICE_DT_NAME(DT_NODELABEL(td_o)); break;
+    case 0x70018: target.behavior_dev = DEVICE_DT_NAME(DT_NODELABEL(td_u)); break;
+    default: return -EINVAL;
+    }
+    if (pressed && e.position < ARRAY_SIZE(vowel_shift))
+        vowel_shift[e.position] = zmk_hid_get_explicit_mods() & 0x22;
+    return zmk_behavior_invoke_binding(&target, e, pressed);
+}
+static int vowel_press(struct zmk_behavior_binding *b, struct zmk_behavior_binding_event e) {
+    return vowel_invoke(b, e, true);
+}
+static int vowel_release(struct zmk_behavior_binding *b, struct zmk_behavior_binding_event e) {
+    return vowel_invoke(b, e, false);
+}
+static const struct behavior_driver_api vowel_api = {
+    .binding_pressed = vowel_press, .binding_released = vowel_release,
+};
+BEHAVIOR_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, POST_KERNEL,
+                       CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &vowel_api);

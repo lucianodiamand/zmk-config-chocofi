@@ -164,6 +164,7 @@
         };
     };
     behaviors {
+        cv: vowel_capture { compatible = "custom,vowel-capture"; #binding-cells = <1>; };
         ck: case_key { compatible = "custom,case-key"; #binding-cells = <1>; };
         cm: case_mode { compatible = "custom,case-mode"; #binding-cells = <1>; };
         dashboard_sync: dsync {
@@ -340,8 +341,8 @@
 // |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M   |  ,  |  .  |  /  |
 //            | ESC | SPACE | TAB |  | ENT | BSPC | DEL |
                         bindings = <
-   &ck Q &ck W &td_e &ck R &ck T   &ck Y &td_u  &td_i     &td_o   &ck P
-   &a_key LGUI 0 &mt LALT S &mt LCTRL D &mt LSHFT F &ck G   &ck H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
+   &ck Q &ck W &cv E &ck R &ck T   &ck Y &cv U  &cv I     &cv O   &ck P
+   &cv A &mt LALT S &mt LCTRL D &mt LSHFT F &ck G   &ck H &mt RSHFT J &mt RCTRL K &mt RALT L &mt RGUI SEMI
    &ck Z &ck X &ck C &ck V &ck B   &td_n &ck M  &kp COMMA &kp DOT &kp FSLH
        &lt _MED ESC &lt _NAV SPACE &lt _MOU TAB  &enter_sym _SYM RET &lt _NUM BSPC &lt _FUN DEL
                         >;
