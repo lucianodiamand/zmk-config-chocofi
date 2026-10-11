@@ -5,7 +5,33 @@
 #include <drivers/behavior.h>
 #include <zmk/events/keycode_state_changed.h>
 #include <zmk/hid.h>
+#include <zmk/event_manager.h>
+#include <zmk/events/position_state_changed.h>
 #include "case_state.h"
+
+/* Save Shift on physical vowel down, before tap-dance delays its output.
+ * Do not clear on upstroke: the selected tap may be emitted after release. */
+static uint8_t vowel_shift[36];
+static uint32_t vowel_at_position(uint32_t position) {
+    switch (position) {
+    case 2: return 0x70008;  /* E */
+    case 6: return 0x70018;  /* U */
+    case 7: return 0x7000c;  /* I */
+    case 8: return 0x70012;  /* O */
+    case 10: return 0x70004; /* A */
+    default: return 0;
+    }
+}
+static int capture_vowel_shift(const zmk_event_t *eh) {
+    const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
+    if (ev && ev->state && ev->position < ARRAY_SIZE(vowel_shift) &&
+        vowel_at_position(ev->position)) {
+        vowel_shift[ev->position] = zmk_hid_get_explicit_mods() & 0x22;
+    }
+    return ZMK_EV_EVENT_BUBBLE;
+}
+ZMK_LISTENER(chocofi_vowel_shift, capture_vowel_shift);
+ZMK_SUBSCRIPTION(chocofi_vowel_shift, zmk_position_state_changed);
 
 static struct case_state state;
 static atomic_t display_mode;
@@ -21,6 +47,10 @@ static int press(struct zmk_behavior_binding *b, struct zmk_behavior_binding_eve
         /* Preserve Ctrl/Alt/GUI shortcuts; Unicode hex input uses stock kp. */
         if (!(zmk_hid_get_explicit_mods() & 0xdd))
             output = case_transform(&state, output);
+        if (output && e.position < ARRAY_SIZE(vowel_shift) &&
+            b->param1 == vowel_at_position(e.position)) {
+            output |= (uint32_t)vowel_shift[e.position] << 24;
+        }
 #endif
         held[i].used = true; held[i].position = e.position;
         held[i].input = b->param1; held[i].output = output;
