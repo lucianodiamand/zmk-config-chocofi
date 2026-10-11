@@ -115,3 +115,27 @@ static const struct behavior_driver_api vowel_api = {
 };
 BEHAVIOR_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, POST_KERNEL,
                        CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &vowel_api);
+
+/* Shifted symbols retain their own modifier reference until key release.
+ * Stock implicit modifiers are global and can be cleared by another key. */
+#undef DT_DRV_COMPAT
+#define DT_DRV_COMPAT custom_symbol_key
+static int symbol_emit(struct zmk_behavior_binding *b,
+                       struct zmk_behavior_binding_event e, bool pressed) {
+    struct zmk_keycode_state_changed ev =
+        zmk_keycode_state_changed_from_encoded(b->param1, pressed, e.timestamp);
+    ev.explicit_modifiers |= ev.implicit_modifiers;
+    ev.implicit_modifiers = 0;
+    return raise_zmk_keycode_state_changed(ev);
+}
+static int symbol_press(struct zmk_behavior_binding *b, struct zmk_behavior_binding_event e) {
+    return symbol_emit(b, e, true);
+}
+static int symbol_release(struct zmk_behavior_binding *b, struct zmk_behavior_binding_event e) {
+    return symbol_emit(b, e, false);
+}
+static const struct behavior_driver_api symbol_api = {
+    .binding_pressed = symbol_press, .binding_released = symbol_release,
+};
+BEHAVIOR_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, POST_KERNEL,
+                       CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &symbol_api);

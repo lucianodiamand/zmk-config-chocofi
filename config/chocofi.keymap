@@ -164,6 +164,7 @@
         };
     };
     behaviors {
+        sk: symbol_key { compatible = "custom,symbol-key"; #binding-cells = <1>; };
         cv: vowel_capture { compatible = "custom,vowel-capture"; #binding-cells = <1>; };
         ck: case_key { compatible = "custom,case-key"; #binding-cells = <1>; };
         cm: case_mode { compatible = "custom,case-mode"; #binding-cells = <1>; };
@@ -383,10 +384,10 @@
 // |  ~  |  !  |  @  |  #  |  |  |   |     |     |     |     |     |
 //             |  (  |  )  |  _  |   |     |_____|     |     |
                         bindings = <
-&kp LBRC  &kp AMPS &kp ASTRK &kp LPAR  &kp RBRC  &none  &none     &none     &none    &none
-&kp COLON &kp DLLR &kp PRCNT &kp CARET &kp PLUS  &none  &kp RSHFT &kp RCTRL &kp RALT &kp RGUI
-&kp TILDE &kp EXCL &kp AT    &kp HASH  &kp PIPE &none  &none     &none     &none    &none
-                   &kp LPAR  &kp RPAR  &kp UNDER &trans &none     &none
+&sk LBRC  &sk AMPS &sk ASTRK &sk LPAR  &sk RBRC  &none  &none     &none     &none    &none
+&sk COLON &sk DLLR &sk PRCNT &sk CARET &sk PLUS  &none  &kp RSHFT &kp RCTRL &kp RALT &kp RGUI
+&sk TILDE &sk EXCL &sk AT    &sk HASH  &sk PIPE &none  &none     &none     &none    &none
+                   &sk LPAR  &sk RPAR  &sk UNDER &trans &none     &none
                         >;
                 };
 
