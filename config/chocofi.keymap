@@ -386,7 +386,7 @@
                         bindings = <
 &sym_key LBRC  &sym_key AMPS &sym_key ASTRK &sym_key LPAR  &sym_key RBRC  &none  &none     &none     &none    &none
 &sym_key COLON &sym_key DLLR &sym_key PRCNT &sym_key CARET &sym_key PLUS  &none  &kp RSHFT &kp RCTRL &kp RALT &kp RGUI
-&sym_key TILDE &syme_key EXCL &sym_key AT    &sym_key HASH  &sym_key PIPE &none  &none     &none     &none    &none
+&sym_key TILDE &sym_key EXCL &sym_key AT    &sym_key HASH  &sym_key PIPE &none  &none     &none     &none    &none
                    &sym_key LPAR  &sym_key RPAR  &sym_key UNDER &trans &none     &none
                         >;
                 };
